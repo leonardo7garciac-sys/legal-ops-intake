@@ -84,3 +84,7 @@ member may submit a request and view the queue — that's the whole point of an 
 front door, and no personal data is at stake. The restriction that actually matters is
 on `UPDATE`, which is limited to the assigned lawyer, or to any active lawyer while the
 request is unassigned. That policy is what `lawyers.auth_user_id` exists to support.
+
+The **Leaked Password Protection Disabled** warning remains open because HaveIBeenPwned
+integration requires a paid Supabase plan. It is not applicable to this demonstration
+project, which has a single seeded account.
