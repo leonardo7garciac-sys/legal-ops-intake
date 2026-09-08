@@ -1,4 +1,5 @@
 import { useAuth } from '../../lib/AuthContext'
+import { IntakeForm } from '../intake/IntakeForm'
 import './AppShell.css'
 
 export function AppShell() {
@@ -15,7 +16,9 @@ export function AppShell() {
           </button>
         </div>
       </header>
-      <main className="app-shell-main" />
+      <main className="app-shell-main">
+        <IntakeForm />
+      </main>
     </div>
   )
 }
