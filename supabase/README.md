@@ -11,8 +11,13 @@ no automated pipeline connecting this repo to Supabase — migrations are applie
 3. Paste the full contents and run it.
 4. Confirm no errors, then move on to the next file if there is one.
 
-Currently there is one migration: `20260907120000_create_schema.sql`, which creates the
-full initial schema (`lawyers`, `requests`, `status_transitions`) in one file.
+There are currently two migrations, applied in order:
+
+1. `20260907120000_create_schema.sql` — creates the full initial schema (`lawyers`,
+   `requests`, `status_transitions`).
+2. `20260907130000_fix_linter_warnings.sql` — pins `set_updated_at()`'s `search_path`
+   and revokes direct `EXECUTE` on `log_status_transition()`, addressing two Supabase
+   database linter warnings.
 
 ## Tables
 
@@ -69,3 +74,13 @@ policies on any table. Row Level Security is enabled on every table.
 
 This assumes Supabase Auth and a login flow exist; wiring those up, and mapping signed-in
 users to `lawyers.auth_user_id`, is separate work not covered by this migration.
+
+## Linter notes
+
+The Supabase database linter flags the `SELECT` and `INSERT` policies on `requests`
+("requests_select_authenticated", "requests_insert_authenticated") as **RLS Policy
+Always True**. This is intentional, not an oversight: any authenticated Corvina staff
+member may submit a request and view the queue — that's the whole point of an internal
+front door, and no personal data is at stake. The restriction that actually matters is
+on `UPDATE`, which is limited to the assigned lawyer, or to any active lawyer while the
+request is unassigned. That policy is what `lawyers.auth_user_id` exists to support.
