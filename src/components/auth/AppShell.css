@@ -1,0 +1,46 @@
+.app-shell {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.app-shell-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: normal;
+  font-size: 15px;
+}
+
+.app-shell-account button {
+  font: inherit;
+  color: var(--text-h);
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.app-shell-account button:hover {
+  box-shadow: var(--shadow);
+}
+
+.app-shell-account button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.app-shell-main {
+  flex-grow: 1;
+}
