@@ -24,6 +24,7 @@ export interface SubmittedRequestSummary {
   reference: string
   lane: TriageLane
   reason: string
+  assignedLawyerName: string | null
 }
 
 const initialState: IntakeFormState = {
@@ -105,13 +106,29 @@ export function useIntakeForm() {
         involves_international_transfer: form.involvesInternationalTransfer,
         triage_lane: triage.lane,
       })
-      .select('id')
+      .select('id, assigned_lawyer_id')
       .single()
 
     if (insertError) {
       setError(insertError.message)
     } else {
-      setSubmittedRequest({ reference: data.id.slice(0, 8), lane: triage.lane, reason: triage.reason })
+      let assignedLawyerName: string | null = null
+
+      if (data.assigned_lawyer_id) {
+        const { data: lawyer } = await supabase
+          .from('lawyers')
+          .select('name')
+          .eq('id', data.assigned_lawyer_id)
+          .single()
+        assignedLawyerName = lawyer?.name ?? null
+      }
+
+      setSubmittedRequest({
+        reference: data.id.slice(0, 8),
+        lane: triage.lane,
+        reason: triage.reason,
+        assignedLawyerName,
+      })
       setForm(initialState)
     }
 

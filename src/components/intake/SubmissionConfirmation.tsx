@@ -15,6 +15,10 @@ export function SubmissionConfirmation({ submittedRequest }: Props) {
       Request submitted. Reference: {submittedRequest.reference}
       <br />
       Lane: {laneLabel}. {submittedRequest.reason}
+      <br />
+      {submittedRequest.assignedLawyerName
+        ? `Assigned to: ${submittedRequest.assignedLawyerName}.`
+        : 'Not yet assigned to a lawyer.'}
     </p>
   )
 }

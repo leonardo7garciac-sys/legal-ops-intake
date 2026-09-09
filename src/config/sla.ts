@@ -1,6 +1,7 @@
 // Single source of truth for request-type SLAs and routing weights.
-// The weight field is defined here for issue #5 (weighted-workload routing)
-// but is not consumed anywhere yet.
+// Routing itself runs in Postgres (see request_type_weight() in
+// supabase/migrations/20260909150000_add_weighted_routing.sql), which hand-copies
+// these weights — keep both in sync when either changes.
 import type { RequestType } from '../lib/database.types'
 
 interface RequestTypeConfig {
