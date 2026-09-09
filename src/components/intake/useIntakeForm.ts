@@ -3,7 +3,8 @@ import type { FormEvent } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { REQUEST_TYPE_OPTIONS, getSlaDeadline, isJustificationRequired } from '../../config/sla'
 import { DEPARTMENTS } from '../../config/departments'
-import type { EstimatedValueBand, RequestType } from '../../lib/database.types'
+import { computeTriage } from '../../config/triage'
+import type { EstimatedValueBand, RequestType, TriageLane } from '../../lib/database.types'
 
 export interface IntakeFormState {
   requestType: RequestType
@@ -17,6 +18,12 @@ export interface IntakeFormState {
   involvesEmployeeData: boolean
   involvesThirdPartyData: boolean
   involvesInternationalTransfer: boolean
+}
+
+export interface SubmittedRequestSummary {
+  reference: string
+  lane: TriageLane
+  reason: string
 }
 
 const initialState: IntakeFormState = {
@@ -43,7 +50,7 @@ export function useIntakeForm() {
   const [form, setForm] = useState<IntakeFormState>(initialState)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [submittedReference, setSubmittedReference] = useState<string | null>(null)
+  const [submittedRequest, setSubmittedRequest] = useState<SubmittedRequestSummary | null>(null)
 
   function setField<K extends keyof IntakeFormState>(key: K, value: IntakeFormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -57,7 +64,7 @@ export function useIntakeForm() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
-    setSubmittedReference(null)
+    setSubmittedRequest(null)
 
     if (desiredDateObj !== null && desiredDateObj.getTime() <= startOfToday().getTime()) {
       setError('Desired date must be in the future.')
@@ -73,6 +80,15 @@ export function useIntakeForm() {
 
     setSubmitting(true)
 
+    const triage = computeTriage({
+      requestType: form.requestType,
+      estimatedValueBand: form.estimatedValueBand,
+      involvesCustomerData: form.involvesCustomerData,
+      involvesEmployeeData: form.involvesEmployeeData,
+      involvesThirdPartyData: form.involvesThirdPartyData,
+      involvesInternationalTransfer: form.involvesInternationalTransfer,
+    })
+
     const { data, error: insertError } = await supabase
       .from('requests')
       .insert({
@@ -87,6 +103,7 @@ export function useIntakeForm() {
         involves_employee_data: form.involvesEmployeeData,
         involves_third_party_data: form.involvesThirdPartyData,
         involves_international_transfer: form.involvesInternationalTransfer,
+        triage_lane: triage.lane,
       })
       .select('id')
       .single()
@@ -94,7 +111,7 @@ export function useIntakeForm() {
     if (insertError) {
       setError(insertError.message)
     } else {
-      setSubmittedReference(data.id.slice(0, 8))
+      setSubmittedRequest({ reference: data.id.slice(0, 8), lane: triage.lane, reason: triage.reason })
       setForm(initialState)
     }
 
@@ -106,7 +123,7 @@ export function useIntakeForm() {
     setField,
     submitting,
     error,
-    submittedReference,
+    submittedRequest,
     slaDeadline,
     justificationRequired,
     handleSubmit,

@@ -32,6 +32,11 @@ export type EstimatedValueBand =
   | '250k_1m'
   | 'over_1m'
 
+export type TriageLane =
+  | 'express'
+  | 'standard'
+  | 'priority'
+
 export interface Database {
   public: {
     Tables: {
@@ -81,6 +86,7 @@ export interface Database {
           involves_employee_data: boolean
           involves_third_party_data: boolean
           involves_international_transfer: boolean
+          triage_lane: TriageLane
           created_at: string
           updated_at: string
         }
@@ -99,6 +105,7 @@ export interface Database {
           involves_employee_data?: boolean
           involves_third_party_data?: boolean
           involves_international_transfer?: boolean
+          triage_lane: TriageLane
           created_at?: string
           updated_at?: string
         }
@@ -117,6 +124,7 @@ export interface Database {
           involves_employee_data?: boolean
           involves_third_party_data?: boolean
           involves_international_transfer?: boolean
+          triage_lane?: TriageLane
           created_at?: string
           updated_at?: string
         }

@@ -11,13 +11,15 @@ no automated pipeline connecting this repo to Supabase — migrations are applie
 3. Paste the full contents and run it.
 4. Confirm no errors, then move on to the next file if there is one.
 
-There are currently two migrations, applied in order:
+There are currently three migrations, applied in order:
 
 1. `20260907120000_create_schema.sql` — creates the full initial schema (`lawyers`,
    `requests`, `status_transitions`).
 2. `20260907130000_fix_linter_warnings.sql` — pins `set_updated_at()`'s `search_path`
    and revokes direct `EXECUTE` on `log_status_transition()`, addressing two Supabase
    database linter warnings.
+3. `20260909140000_add_triage_lane.sql` — adds the `triage_lane` column to
+   `requests`, constrained to `express`/`standard`/`priority`.
 
 ## Tables
 
@@ -35,10 +37,10 @@ receives new assignments.
 One row per intake submission: the request type (one of the five SLA'd types), the
 requesting department, the counterparty's company name (never an individual),
 an estimated value band, a desired date, an optional justification, a free-text
-description, the assigned lawyer, the current status, and four booleans recording
+description, the assigned lawyer, the current status, four booleans recording
 whether the request involves processing of customer data, employee data, third-party
-data, or an international transfer. Those four booleans describe the operation being
-requested, never the underlying personal data itself.
+data, or an international transfer, and the triage lane. Those four booleans describe
+the operation being requested, never the underlying personal data itself.
 
 `justification` is not enforced by a database constraint. Application logic in
 `src/config/sla.ts` requires it whenever the requester's desired date falls short of the
@@ -47,6 +49,12 @@ SLA for that request type; the database only stores the value.
 `description` is free text and must never contain personal data (names, documents,
 contact details, or any other personal data of data subjects). The application warns
 the user of this before submission.
+
+`triage_lane` is computed client-side by `src/config/triage.ts` at submission time and
+is only constrained by the database to be one of the three valid values — it is not
+otherwise enforced. A direct API insert could set any of the three lanes regardless of
+the request's actual fields. In production this rule would instead live in a trigger
+alongside `log_status_transition`, so it could not be bypassed.
 
 ### `status_transitions`
 

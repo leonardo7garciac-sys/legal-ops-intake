@@ -2,6 +2,7 @@ import { useIntakeForm } from './useIntakeForm'
 import { RequestDetailsFields } from './RequestDetailsFields'
 import { SchedulingFields } from './SchedulingFields'
 import { DataProcessingFields } from './DataProcessingFields'
+import { SubmissionConfirmation } from './SubmissionConfirmation'
 import './IntakeForm.css'
 
 export function IntakeForm() {
@@ -10,7 +11,7 @@ export function IntakeForm() {
     setField,
     submitting,
     error,
-    submittedReference,
+    submittedRequest,
     slaDeadline,
     justificationRequired,
     handleSubmit,
@@ -48,11 +49,7 @@ export function IntakeForm() {
           </p>
         )}
 
-        {submittedReference && (
-          <p className="intake-success" role="status">
-            Request submitted. Reference: {submittedReference}
-          </p>
-        )}
+        {submittedRequest && <SubmissionConfirmation submittedRequest={submittedRequest} />}
 
         <button type="submit" disabled={submitting}>
           {submitting ? 'Submitting…' : 'Submit request'}
