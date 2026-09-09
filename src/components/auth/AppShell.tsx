@@ -1,5 +1,5 @@
+import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../../lib/AuthContext'
-import { IntakeForm } from '../intake/IntakeForm'
 import './AppShell.css'
 
 export function AppShell() {
@@ -16,8 +16,12 @@ export function AppShell() {
           </button>
         </div>
       </header>
+      <nav className="app-shell-nav">
+        <NavLink to="/dashboard">Dashboard</NavLink>
+        <NavLink to="/new">New request</NavLink>
+      </nav>
       <main className="app-shell-main">
-        <IntakeForm />
+        <Outlet />
       </main>
     </div>
   )

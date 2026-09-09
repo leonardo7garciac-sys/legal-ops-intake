@@ -1,0 +1,170 @@
+.dashboard-screen {
+  padding: 24px;
+  text-align: left;
+}
+
+.dashboard-error {
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.dashboard-workload {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+.dashboard-workload caption {
+  text-align: left;
+  font-weight: 500;
+  color: var(--text-h);
+  margin-bottom: 8px;
+}
+
+.dashboard-workload th,
+.dashboard-workload td {
+  text-align: left;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dashboard-filters {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard-filters label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.dashboard-filters .dashboard-filters-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-filters select {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.dashboard-requests {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-requests th,
+.dashboard-requests td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.dashboard-requests button {
+  font: inherit;
+  border: 1px solid var(--border);
+  background: var(--social-bg);
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.dashboard-requests select {
+  font: inherit;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.dashboard-row-overdue {
+  background: var(--danger-bg);
+}
+
+.dashboard-overdue-marker {
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.dashboard-detail-row td {
+  background: var(--social-bg);
+}
+
+.dashboard-detail-warning {
+  color: var(--danger);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.dashboard-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.dashboard-badge-status-new {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--text-h);
+}
+
+.dashboard-badge-status-in_progress {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.dashboard-badge-status-on_hold {
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.dashboard-badge-status-completed {
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.dashboard-badge-status-cancelled {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.dashboard-badge-lane-express {
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--text-h);
+}
+
+.dashboard-badge-lane-standard {
+  background: var(--social-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.dashboard-badge-lane-priority {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
