@@ -11,7 +11,7 @@ no automated pipeline connecting this repo to Supabase — migrations are applie
 3. Paste the full contents and run it.
 4. Confirm no errors, then move on to the next file if there is one.
 
-There are currently three migrations, applied in order:
+There are currently five migrations, applied in order:
 
 1. `20260907120000_create_schema.sql` — creates the full initial schema (`lawyers`,
    `requests`, `status_transitions`).
@@ -20,6 +20,14 @@ There are currently three migrations, applied in order:
    database linter warnings.
 3. `20260909140000_add_triage_lane.sql` — adds the `triage_lane` column to
    `requests`, constrained to `express`/`standard`/`priority`.
+4. `20260909150000_add_weighted_routing.sql` — adds `request_type_weight()` and a
+   before-insert trigger (`assign_lawyer_for_request`) that assigns each request to
+   the active lawyer with the lowest total open-request weight.
+5. `20260909160000_restrict_request_insert_to_lawyers.sql` — replaces the request
+   `INSERT` policy so only an account linked to an active lawyer may submit a request.
+
+`supabase/seed.sql` is optional demo data — it is not part of the schema and is not
+applied by the migration process above. See "Resetting the demo data" below.
 
 ## Tables
 
@@ -72,10 +80,11 @@ policies on any table. Row Level Security is enabled on every table.
 - **`lawyers`**: any authenticated user can read all rows (needed to populate
   assignment/routing UI). No client insert/update/delete — lawyer records are managed
   directly by an admin via the SQL Editor or service role.
-- **`requests`**: any authenticated user can read all rows and insert a new request. A
-  request can only be *updated* by the lawyer it is assigned to, or by any active lawyer
-  while it is unassigned (so the queue can be picked up). No delete policy — requests
-  are never deleted.
+- **`requests`**: any authenticated user can read all rows. Both *inserting* a new
+  request and *updating* one require the account to be linked to an active lawyer —
+  insert requires only that; update additionally requires the request to be
+  unassigned, or assigned to that same lawyer (so the queue can be picked up). No
+  delete policy — requests are never deleted.
 - **`status_transitions`**: any authenticated user can read all rows. No insert/update/
   delete policy — rows are written only by the `security definer` trigger function
   described above.
@@ -85,14 +94,29 @@ users to `lawyers.auth_user_id`, is separate work not covered by this migration.
 
 ## Linter notes
 
-The Supabase database linter flags the `SELECT` and `INSERT` policies on `requests`
-("requests_select_authenticated", "requests_insert_authenticated") as **RLS Policy
-Always True**. This is intentional, not an oversight: any authenticated Corvina staff
-member may submit a request and view the queue — that's the whole point of an internal
-front door, and no personal data is at stake. The restriction that actually matters is
-on `UPDATE`, which is limited to the assigned lawyer, or to any active lawyer while the
-request is unassigned. That policy is what `lawyers.auth_user_id` exists to support.
+The Supabase database linter flags the `SELECT` policy on `requests`
+("requests_select_authenticated") as **RLS Policy Always True**. This is intentional,
+not an oversight: any authenticated Corvina staff member may view the queue — that's
+the whole point of an internal front door, and no personal data is at stake. Both
+`INSERT` and `UPDATE` are restricted to accounts linked to an active lawyer (`UPDATE`
+additionally requires the request to be unassigned or assigned to that lawyer). That
+restriction is what `lawyers.auth_user_id` exists to support.
 
 The **Leaked Password Protection Disabled** warning remains open because HaveIBeenPwned
 integration requires a paid Supabase plan. It is not applicable to this demonstration
 project, which has a single seeded account.
+
+## Resetting the demo data
+
+To clear demo requests and reseed:
+
+1. In the SQL Editor, run:
+   ```sql
+   delete from requests;
+   ```
+2. Then paste and run the full contents of `supabase/seed.sql`.
+
+Do not delete rows from `lawyers` — routing (issue #5) and the demo account's
+`auth_user_id` link both depend on the existing lawyer records. Deleting a request
+cascades to delete its `status_transitions` rows, so no separate cleanup is needed
+there.
