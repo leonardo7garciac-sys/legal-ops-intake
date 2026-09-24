@@ -90,7 +90,12 @@ export function RequestRow({ request, lawyerNameById, currentLawyer, onUpdateSta
           </td>
         </tr>
       )}
-      {expanded && <RequestDetailRow description={request.description} />}
+      {expanded && (
+        <RequestDetailRow
+          counterpartyName={request.counterparty_name}
+          description={request.description}
+        />
+      )}
     </Fragment>
   )
 }
