@@ -33,10 +33,13 @@ insert into requests (
    current_date + 14, 'Mutual NDA ahead of a technical evaluation.', 'in_progress',
    false, false, false, false, 'express', now() - interval '1 days'),
 
-  -- express: renewal without changes, no personal data, low value
-  ('renewal_no_changes', 'Customer Success', 'Amora Digital Ltda.', 'under_10k',
-   current_date + 14, 'Straight renewal, no changes to existing terms.', 'on_hold',
-   false, false, false, false, 'express', now() - interval '45 days'),
+  -- priority: personal data (customer data) and international transfer —
+  -- Tarnveld B.V. is a Netherlands-based customer of Corvina (not a
+  -- supplier); the renewal triggers an art. 33, LGPD cross-border
+  -- transfer of that customer's data
+  ('renewal_no_changes', 'Customer Success', 'Tarnveld B.V.', 'under_10k',
+   current_date + 14, 'Straight renewal, no changes to existing terms.', 'in_progress',
+   true, false, false, true, 'priority', now() - interval '45 days'),
 
   -- standard: renewal without changes, value band excludes it from express
   ('renewal_no_changes', 'Finance', 'Nortbridge Tecnologia Ltda.', '10k_50k',
@@ -73,7 +76,7 @@ insert into requests (
    current_date + 14, 'Large third-party draft involving shared user data.', 'completed',
    false, false, true, false, 'priority', now() - interval '55 days'),
 
-  -- priority: personal data (international transfer)
+  -- priority: international transfer, no personal-data category flagged
   ('renewal_no_changes', 'Product', 'Marfim Distribuidora Ltda.', 'under_10k',
    current_date + 14, 'Renewal involving a cross-border data transfer.', 'new',
    false, false, false, true, 'priority', now() - interval '2 days'),

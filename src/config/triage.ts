@@ -34,25 +34,40 @@ export interface TriageResult {
   reason: string
 }
 
+// Joins reason fragments into a single sentence-safe list: 1 → "a",
+// 2 → "a and b", 3 → "a, b, and c". A plain ', and '.join is wrong for 3.
+function joinReasons(reasons: string[]): string {
+  if (reasons.length === 2) return `${reasons[0]} and ${reasons[1]}`
+  if (reasons.length > 2) {
+    return `${reasons.slice(0, -1).join(', ')}, and ${reasons[reasons.length - 1]}`
+  }
+  return reasons[0]
+}
+
 // Lane and reason are computed together from the same conditions so they
 // cannot drift apart. Priority is checked first, so it wins over express
 // when both would apply.
 export function computeTriage(input: TriageInput): TriageResult {
+  // Personal-data categories only. An international transfer is an
+  // operation performed on data (LGPD art. 5º, X), not a category of
+  // data, so it is its own condition below rather than folded in here.
   const involvesPersonalData =
-    input.involvesCustomerData ||
-    input.involvesEmployeeData ||
-    input.involvesThirdPartyData ||
-    input.involvesInternationalTransfer
+    input.involvesCustomerData || input.involvesEmployeeData || input.involvesThirdPartyData
 
   const isHighValue =
     input.estimatedValueBand !== '' && PRIORITY_VALUE_BANDS.includes(input.estimatedValueBand)
 
-  if (involvesPersonalData || isHighValue) {
+  const involvesInternationalTransfer = input.involvesInternationalTransfer
+
+  if (involvesPersonalData || isHighValue || involvesInternationalTransfer) {
+    const reasons: string[] = []
+    if (involvesPersonalData) reasons.push('personal-data processing')
+    if (isHighValue) reasons.push('an estimated value of R$250k or higher')
+    if (involvesInternationalTransfer) reasons.push('an international data transfer')
+
     return {
       lane: 'priority',
-      reason: involvesPersonalData
-        ? 'Priority: the request involves personal-data processing.'
-        : 'Priority: the estimated value is R$250k or higher.',
+      reason: `Priority: this request involves ${joinReasons(reasons)}.`,
     }
   }
 
@@ -65,7 +80,7 @@ export function computeTriage(input: TriageInput): TriageResult {
       lane: 'express',
       reason:
         'Express: a pontual query, NDA, or renewal without changes, with no personal-data ' +
-        'processing and a low or unspecified estimated value.',
+        'processing, no international transfer, and a low or unspecified estimated value.',
     }
   }
 
